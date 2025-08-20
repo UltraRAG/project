@@ -35,6 +35,7 @@
   <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
   <link rel="stylesheet" href="static/css/index.css">
+  <link rel="stylesheet" href="static/css/custom.css">
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
@@ -42,10 +43,11 @@
   <script src="static/js/bulma-carousel.min.js"></script>
   <script src="static/js/bulma-slider.min.js"></script>
   <script src="static/js/index.js"></script>
+  <!-- <style> </style> -->
 </head>
 
 <body>
-  <section class="hero">
+  <section class="hero hero-landing">
     <div class="hero-body">
       <div class="container is-max-desktop">
         <div class="columns is-centered">
@@ -93,7 +95,7 @@
   </section>
 
   <!-- Intro -->
-  <section class="section hero">
+  <section class="section hero card-section">
     <div class="container is-max-desktop">
       <div class="columns is-centered has-text-centered">
         <div class="column is-four-fifths">
@@ -122,7 +124,7 @@
   </section>
 
   <!-- 大道至简 -->
-  <section class="section hero">
+  <section class="section hero card-section">
     <div class="container is-max-desktop">
       <div class="columns is-centered has-text-centered">
         <div class="column is-four-fifths">
@@ -143,48 +145,50 @@
 
 
             <!-- 表格 -->
-            <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth has-text-centered">
-              <thead>
-                <tr>
-                  <th>特性/框架</th>
-                  <th>官方 IRCoT 实现</th>
-                  <th>FlashRAG</th>
-                  <th>UltraRAG 2.0</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>代码行数</td>
-                  <td>~900 行</td>
-                  <td>110+ 行</td>
-                  <td><strong>50 行以内</strong></td>
-                </tr>
-                <tr>
-                  <td>逻辑实现方式</td>
-                  <td>手写控制逻辑</td>
-                  <td>显式循环、条件判断</td>
-                  <td><strong>声明式 YAML 流程（loop / step）</strong></td>
-                </tr>
-                <tr>
-                  <td>复用性</td>
-                  <td>几乎无复用，需重写</td>
-                  <td>部分模块可复用</td>
-                  <td>MCP Server 即插即用</td>
-                </tr>
-                <tr>
-                  <td>复杂推理支持</td>
-                  <td>支持有限</td>
-                  <td>有条件支持</td>
-                  <td><strong>原生支持串行、循环、条件分支</strong></td>
-                </tr>
-                <tr>
-                  <td>上手门槛</td>
-                  <td>高（需深入代码）</td>
-                  <td>中等（需理解框架逻辑）</td>
-                  <td><strong>低（配置 YAML + 自定义部分组件）</strong></td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="table-container">
+              <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth has-text-centered">
+                <thead>
+                  <tr>
+                    <th>特性/框架</th>
+                    <th>官方 IRCoT 实现</th>
+                    <th>FlashRAG</th>
+                    <th>UltraRAG 2.0</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>代码行数</td>
+                    <td>~900 行</td>
+                    <td>110+ 行</td>
+                    <td><strong>50 行以内</strong></td>
+                  </tr>
+                  <tr>
+                    <td>逻辑实现方式</td>
+                    <td>手写控制逻辑</td>
+                    <td>显式循环、条件判断</td>
+                    <td><strong>声明式 YAML 流程（loop / step）</strong></td>
+                  </tr>
+                  <tr>
+                    <td>复用性</td>
+                    <td>几乎无复用，需重写</td>
+                    <td>部分模块可复用</td>
+                    <td><strong>MCP Server 即插即用</strong></td>
+                  </tr>
+                  <tr>
+                    <td>复杂推理支持</td>
+                    <td>支持有限</td>
+                    <td>有条件支持</td>
+                    <td><strong>原生支持串行、循环、条件分支</strong></td>
+                  </tr>
+                  <tr>
+                    <td>上手门槛</td>
+                    <td>高（需深入代码）</td>
+                    <td>中等（需理解框架逻辑）</td>
+                    <td><strong>低<br>（配置 YAML + 自定义部分组件）</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
             <p>
               我们进一步展示了不同框架在相同功能实现上的差异。可以看到，FlashRAG 的实现仍然需要冗长的控制逻辑，涉及显式的循环、条件判断与状态更新。而在 UltraRAG 2.0 中，这些逻辑仅需几行 Pipeline
@@ -207,7 +211,7 @@
 
 
   <!-- 简而不凡 -->
-  <section class="section hero">
+  <section class="section hero card-section">
     <div class="container is-max-desktop">
       <div class="columns is-centered has-text-centered">
         <div class="column is-four-fifths">
@@ -255,7 +259,7 @@
   </section>
 
   <!-- 秘诀 -->
-  <section class="section hero">
+  <section class="section hero card-section">
     <div class="container is-max-desktop">
       <div class="columns is-centered has-text-centered">
         <div class="column is-four-fifths">

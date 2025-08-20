@@ -1,0 +1,134 @@
+:root {
+    --ur-primary: #3a7bd5;
+    --ur-accent: #00d2ff;
+    --ur-text: #1f2d3d;
+    --ur-muted: #6b7280;
+    --ur-card-bg: #ffffff;
+    --ur-bg: #f6f8fb;
+}
+
+html,
+body {
+    background: var(--ur-bg);
+    color: var(--ur-text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+    color: var(--ur-primary);
+}
+
+a:hover {
+    color: #285ea6;
+}
+
+/* Landing hero */
+.hero-landing {
+    background: radial-gradient(1000px 400px at 50% -150px, rgba(0, 210, 255, .25), rgba(0, 0, 0, 0)), linear-gradient(180deg, #fff 0%, #f6f8fb 100%);
+    padding-top: 2.5rem;
+    padding-bottom: 2rem;
+}
+
+.hero-landing .publication-title img {
+    max-height: 110px;
+}
+
+.publication-links .button {
+    margin: .25rem .35rem;
+}
+
+.publication-links .button .icon {
+    margin-right: .35rem;
+}
+
+/* Card-like content sections */
+.card-section .container.is-max-desktop {
+    background: var(--ur-card-bg);
+    border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(16, 24, 40, .08);
+    padding: 2.25rem 2rem;
+}
+
+.card-section h2.title {
+    margin-bottom: 1.1rem
+}
+
+.content p {
+    line-height: 1.85
+}
+
+.content ul {
+    margin-left: 1.2rem
+}
+
+.content ul li {
+    margin: .25rem 0
+}
+
+/* Media prettify */
+.content .item img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 8px 28px rgba(16, 24, 40, .12);
+}
+
+.subtitle.has-text-centered {
+    font-size: .95rem;
+    color: var(--ur-muted);
+    margin-top: .5rem
+}
+
+/* Table improvements */
+.table thead th {
+    background: linear-gradient(180deg, #f9fbff 0%, #eef4ff 100%);
+    color: #0f172a;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.table tbody td {
+    vertical-align: middle
+}
+
+.table-container {
+    margin: .75rem 0 1.25rem;
+}
+
+/* Section rhythm */
+section.section.hero {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+}
+
+/* Responsive video (YouTube iframe, if used) */
+.publication-video {
+    position: relative;
+    padding-top: 56.25%;
+}
+
+.publication-video iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    border-radius: 12px;
+    box-shadow: 0 8px 28px rgba(16, 24, 40, .12);
+}
+
+/* Footer */
+.footer {
+    background: #0b1220;
+    color: #cfd6e4
+}
+
+.footer a {
+    color: #93c5fd
+}
+
+.footer a:hover {
+    color: #60a5fa
+}
