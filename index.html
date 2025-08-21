@@ -97,6 +97,7 @@
     <div class="container is-max-desktop">
       <div class="columns is-centered has-text-centered">
         <div class="column is-four-fifths">
+          <h2 class="title is-3">UltraRAG 2.0：面向科研的“RAG实验”加速器</h2>
           <div class="content has-text-justified">
             <p>
               检索增强生成系统（RAG）正从早期“检索+生成”的简单拼接，走向融合<strong>自适应知识组织、多轮推理、动态检索</strong>的复杂知识系统（典型代表如
@@ -151,68 +152,144 @@
                     style="display:block; width:100%; height:auto; border-radius:12px; box-shadow: 0 10px 20px rgba(0,0,0,.06);" />
                 </div>
               </div>
-              <h2 class="subtitle has-text-centered">不同框架实现 IRCoT 的代码行数与构成对比</h2>
+              <h2 class="subtitle has-text-centered">不同框架实现 IRCoT 的代码规模与结构差异</h2>
             </div>
 
 
-            <!-- 表格 -->
-            <div class="table-container">
-              <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth has-text-centered">
-                <thead>
-                  <tr>
-                    <th>特性/框架</th>
-                    <th>官方 IRCoT 实现</th>
-                    <th>FlashRAG</th>
-                    <th>UltraRAG 2.0</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><strong>代码行数</strong></td>
-                    <td>~900 行</td>
-                    <td>110+ 行</td>
-                    <td><strong>50 行以内</strong></td>
-                  </tr>
-                  <tr>
-                    <td><strong>逻辑实现<br>方式</strong></td>
-                    <td>手写控制逻辑</td>
-                    <td>显式循环、条件判断</td>
-                    <td><strong>声明式 YAML 流程（loop / step）</strong></td>
-                  </tr>
-                  <tr>
-                    <td><strong>复用性</strong></td>
-                    <td>几乎无复用，需重写</td>
-                    <td>部分模块可复用</td>
-                    <td><strong>MCP Server 即插即用</strong></td>
-                  </tr>
-                  <tr>
-                    <td><strong>复杂推理<br>支持</strong></td>
-                    <td>支持有限</td>
-                    <td>有条件支持</td>
-                    <td><strong>原生支持串行、循环、条件分支</strong></td>
-                  </tr>
-                  <tr>
-                    <td><strong>上手门槛</strong></td>
-                    <td>高<br>（需深入代码）</td>
-                    <td>中等<br>（需理解框架逻辑）</td>
-                    <td><strong>低<br>（配置 YAML + 自定义部分组件）</strong></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+        
 
             <p>
               我们进一步展示了不同框架在相同功能实现上的差异。可以看到，FlashRAG 的实现仍然需要冗长的控制逻辑，涉及显式的循环、条件判断与状态更新。而在 UltraRAG 2.0 中，这些逻辑仅需 <strong>几行
                 Pipeline YAML 配置</strong> 即可表达，分支与循环均以简洁的声明方式完成，避免了繁琐的手动编码。
             </p>
 
-            <div class="item">
-              <!-- Your image here -->
-              <img src="static/images/code_compare.png" alt="MY ALT TEXT" />
-              <h2 class="subtitle has-text-centered">
-                不同框架相同功能实现代码对比
-              </h2>
-            </div>
+            <!-- 代码对比：FlashRAG vs UltraRAG -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<style>
+  /* 白色、简洁风格，与页面其他模块一致 */
+  .code-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .code-compare { grid-template-columns: 1fr; }
+  }
+  .code-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(17, 24, 39, 0.04);
+    overflow: hidden;
+  }
+  .code-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: #fafafa;
+    border-bottom: 1px solid #eef2f6;
+    font-weight: 600;
+    color: #111827;
+  }
+  .code-badges { display: inline-flex; gap: 8px; }
+  .code-badge {
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    color: #6b7280;
+    background: #ffffff;
+  }
+  .code-card__body {
+    height: 360px;         /* 固定高度，可根据需要调整 */
+    overflow: auto;        /* 内容超出时滚动 */
+  }
+  .code-card pre {
+    margin: 0;
+    padding: 12px 14px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    background: transparent; /* 保持白底 */
+  }
+</style>
+
+<div class="code-compare">
+  <!-- 左：FlashRAG (Python) -->
+  <section class="code-card" aria-label="FlashRAG code">
+    <div class="code-card__header">
+      <span>FlashRAG</span>
+      <div class="code-badges">
+        <span class="code-badge">Python</span>
+        <span class="code-badge">Batch + Loop</span>
+      </div>
+    </div>
+    <div class="code-card__body" role="region" aria-label="FlashRAG source code">
+      <pre><code class="language-python"># [A] 批量构造提示
+input_prompts = [
+    tmpl.get_string(
+        question=items[i].question,
+        retrieval_result=batch_retrieval_results[i],
+        previous_gen=' '.join(batch_thoughts[i])
+    )
+    for i in active_item_ids
+]
+
+# [B] 批量生成
+new_thoughts = generator.generate(input_prompts, stop=['.', '\n'])
+
+# [C] 逐项更新 + 终止判定
+next_active = []
+for local_idx, item_id in enumerate(active_item_ids):
+    thought = new_thoughts[local_idx]
+    batch_thoughts[item_id].append(thought)
+
+    items[item_id].update_output(
+        f'intermediate_output_iter{iter_num}',
+        {'input_prompt': input_prompts[local_idx], 'new_thought': thought}
+    )
+    # [D] 终止条件
+    if "so the answer is" not in thought.lower():
+        next_active.append(item_id)
+
+# [E] 仅继续未完成
+active_item_ids = next_active</code></pre>
+    </div>
+  </section>
+
+  <!-- 右：UltraRAG (YAML) -->
+  <section class="code-card" aria-label="UltraRAG code">
+    <div class="code-card__header">
+      <span>UltraRAG</span>
+      <div class="code-badges">
+        <span class="code-badge">YAML</span>
+        <span class="code-badge">Branch Router</span>
+      </div>
+    </div>
+    <div class="code-card__body" role="region" aria-label="UltraRAG source code">
+      <pre><code class="language-yaml">
+# [A]~[B] 由上游节点批量生成 ans_ls
+- branch:
+    router:
+    # [C][D] 判定 state=complete/incomplete
+      - router.ircot_check_end    
+    branches:
+      incomplete:
+      # [E] 对未完成样本继续
+        - custom.ircot_get_first_sent  
+      complete: []</code></pre>
+    </div>
+  </section>
+</div>
+<h2 class="subtitle has-text-centered">FlashRAG 与 UltraRAG 的代码实现对比</h2>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+<script>hljs.highlightAll();</script>
+
+         
 
           </div>
         </div>
@@ -254,7 +331,7 @@
 
             <div class="item">
               <!-- Your image here -->
-              <img src="static/images/performance.png" alt="MY ALT TEXT"
+              <img src="static/images/performance.svg" alt="MY ALT TEXT"
                 style="width:55%; display:block; margin:0 auto;">
               <h2 class="subtitle has-text-centered">
                 示例系统性能表现
@@ -278,9 +355,11 @@
                     <h2 class="subtitle has-text-centered">电子信息秋招求职</h2>
                   </figure>
                   <div class="content" style="max-height:520px; overflow:auto; padding-right:.5rem;">
-                    <h4 class="title is-6">问题输入</h4>
+                    <h4 class="title is-6" style="color:#2563eb;">问题输入</h4>
                     <p>个人情况大概是本科时没有好好学习 成绩很烂 然后来了一年水硕 硕士期间成绩还不错 但是真东西没怎么学到 只有一段实习 没有项目 现在感觉找技术岗对我来说很难
                       很迷茫求一些就业方向的建议#应届生找工作 #应届生 #应届 #秋招 #校招 #26秋招 #水硕</p>
+                    
+                    <h4 class="title is-6" style="color:#2563eb;">生成结果</h4>
                     <p><strong>电子信息专业应届生秋招求职方向建议</strong></p>
 
                     <h5 class="title is-6">求职现状分析</h5>
@@ -352,9 +431,11 @@
                     <h2 class="subtitle has-text-centered">士官学校 vs 大专走义务兵</h2>
                   </figure>
                   <div class="content" style="max-height:520px; overflow:auto; padding-right:.5rem;">
-                    <h4 class="title is-6">问题输入</h4>
+                    <h4 class="title is-6" style="color:#2563eb;">问题输入</h4>
                     <p>弟弟今年高考 马上报志愿 士官学校和大专走义务兵那个好一点呀？有没有过来人指点一下呀！
                       #不懂就问有问必答 #万能的小红书</p>
+
+                    <h4 class="title is-6" style="color:#2563eb;">生成结果</h4>
                     <p><strong>士官学校与大专走义务兵的优劣分析及选择建议</strong></p>
 
                     <h5 class="title is-6">理解两种选择的基本定义与特点</h5>
@@ -436,6 +517,7 @@
                 </article>
               </div>
             </div>
+            <h2 class="subtitle has-text-centered">示例系统生成案例</h2>
 
             <p>
               UltraRAG 2.0 让复杂推理系统的构建真正做到
@@ -492,7 +574,7 @@
             </p>
 
             <p>
-              <strong>👉 欢迎访问<a href="https://ur.xinhaidong.top">教程文档</a>快速上手 UltraRAG 2.0！</strong>
+              <strong>欢迎访问<a href="https://ur.xinhaidong.top">教程文档</a>快速上手 UltraRAG 2.0！</strong>
             </p>
 
           </div>
