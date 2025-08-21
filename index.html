@@ -101,21 +101,27 @@
         <div class="column is-four-fifths">
           <div class="content has-text-justified">
             <p>
-              检索增强生成系统（RAG）正从早期“检索+生成”的简单拼接，走向融合自适应知识组织、多轮推理、动态检索的复杂知识系统（典型代表如
-              DeepResearch、Search-o1）。但这种复杂度的提升，使开发者在方法复现、快速迭代新想法时，面临着高昂的工程实现成本。
+              检索增强生成系统（RAG）正从早期“检索+生成”的简单拼接，走向融合<strong>自适应知识组织、多轮推理、动态检索</strong>的复杂知识系统（典型代表如
+              DeepResearch、Search-o1）。但这种复杂度的提升，使开发者在<strong>方法复现、快速迭代新想法</strong>时，面临着高昂的工程实现成本。
             </p>
             <p>
-              为了解决这一痛点，清华大学 THUNLP 实验室、东北大学 NEUIR 实验室、OpenBMB 与 AI9Stars 联合推出 UltraRAG 2.0 （UR-2.0）—— 首个基于 Model Context
-              Protocol (MCP) 架构设计的 RAG 框架。这一设计让科研人员只需编写 YAML 文件，就可以直接声明串行、循环、条件分支等复杂逻辑，从而以极低的代码量快速实现多阶段推理系统。
+              为了解决这一痛点，清华大学 <a href="https://nlp.csai.tsinghua.edu.cn/" target="_blank">THUNLP</a> 实验室、东北大学 <a
+                href="https://neuir.github.io" target="_blank">NEUIR</a>
+              实验室、<a href="https://www.openbmb.cn/home" target="_blank">OpenBMB</a> 与 <a
+                href="https://github.com/AI9Stars" target="_blank">AI9Stars</a> 联合推出 UltraRAG 2.0 （UR-2.0）—— 首个基于 <a
+                href="https://modelcontextprotocol.io/overview" target="_blank">Model Context Protocol (MCP)</a> 架构设计的
+              RAG 框架。这一设计让科研人员只需编写 <strong>YAML
+              </strong>文件，就可以直接声明<strong>串行、循环、条件分支</strong>等复杂逻辑，<strong>从而以极低的代码量快速实现多阶段推理系统。</strong>
             </p>
             <p>其核心思路是：</p>
             <ul>
-              <li>组件化封装：将 RAG 的核心组件封装为标准化的独立 MCP Server；</li>
-              <li>灵活调用与扩展：提供函数级 Tool 接口，支持功能的灵活调用与扩展；</li>
-              <li>轻量流程编排：借助 MCP Client，建立自上而下的简洁化链路搭建；</li>
+              <li>组件化封装：将 RAG 的核心组件封装为<strong>标准化的独立 MCP Server</strong>；</li>
+              <li>灵活调用与扩展：提供<strong>函数级 Tool 接口</strong>，支持功能的灵活调用与扩展；</li>
+              <li>轻量流程编排：借助 <strong>MCP Client</strong>，建立自上而下的简洁化链路搭建；</li>
             </ul>
             <p>
-              与传统框架相比，UltraRAG 2.0 显著降低了复杂 RAG 系统的技术门槛与学习成本，让研究者能够将更多精力投入到实验设计与算法创新上，而不是陷入冗长的工程实现。
+              与传统框架相比，UltraRAG 2.0 显著降低了复杂 RAG
+              系统的<strong>技术门槛与学习成本</strong>，让研究者能够将更多精力投入到<strong>实验设计与算法创新</strong>上，而不是陷入冗长的工程实现。
             </p>
           </div>
         </div>
@@ -131,8 +137,9 @@
           <h2 class="title is-3">大道至简：让科研实验专注思想而非工程</h2>
           <div class="content has-text-justified">
             <p>
-              “简”的价值，在实践中尤为直观。以 IRCoT（https://arxiv.org/abs/2212.10509）这一经典方法为例，官方实现需要近 900 行手写逻辑，FlashRAG 也需要超过
-              110行代码。而 UltraRAG 2.0 仅用 50 行代码即可完成同等功能。
+              “简”的价值，在实践中尤为直观。以 <a href="https://arxiv.org/abs/2212.10509" target="_blank">IRCoT</a>
+              这一经典方法为例，官方实现需要 <strong>近 900 行手写逻辑</strong>，FlashRAG 也需要 <strong>超过 110 行代码</strong>。而 UltraRAG 2.0 仅用
+              <strong>50 行代码</strong> 即可完成同等功能。
             </p>
 
             <div class="item">
@@ -158,33 +165,33 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td>代码行数</td>
+                    <td><strong>代码行数</strong></td>
                     <td>~900 行</td>
                     <td>110+ 行</td>
                     <td><strong>50 行以内</strong></td>
                   </tr>
                   <tr>
-                    <td>逻辑实现方式</td>
+                    <td><strong>逻辑实现<br>方式</strong></td>
                     <td>手写控制逻辑</td>
                     <td>显式循环、条件判断</td>
                     <td><strong>声明式 YAML 流程（loop / step）</strong></td>
                   </tr>
                   <tr>
-                    <td>复用性</td>
+                    <td><strong>复用性</strong></td>
                     <td>几乎无复用，需重写</td>
                     <td>部分模块可复用</td>
                     <td><strong>MCP Server 即插即用</strong></td>
                   </tr>
                   <tr>
-                    <td>复杂推理支持</td>
+                    <td><strong>复杂推理<br>支持</strong></td>
                     <td>支持有限</td>
                     <td>有条件支持</td>
                     <td><strong>原生支持串行、循环、条件分支</strong></td>
                   </tr>
                   <tr>
-                    <td>上手门槛</td>
-                    <td>高（需深入代码）</td>
-                    <td>中等（需理解框架逻辑）</td>
+                    <td><strong>上手门槛</strong></td>
+                    <td>高<br>（需深入代码）</td>
+                    <td>中等<br>（需理解框架逻辑）</td>
                     <td><strong>低<br>（配置 YAML + 自定义部分组件）</strong></td>
                   </tr>
                 </tbody>
@@ -192,8 +199,8 @@
             </div>
 
             <p>
-              我们进一步展示了不同框架在相同功能实现上的差异。可以看到，FlashRAG 的实现仍然需要冗长的控制逻辑，涉及显式的循环、条件判断与状态更新。而在 UltraRAG 2.0 中，这些逻辑仅需几行 Pipeline
-              YAML 配置即可表达，分支与循环均以简洁的声明方式完成，避免了繁琐的手动编码。
+              我们进一步展示了不同框架在相同功能实现上的差异。可以看到，FlashRAG 的实现仍然需要冗长的控制逻辑，涉及显式的循环、条件判断与状态更新。而在 UltraRAG 2.0 中，这些逻辑仅需 <strong>几行
+                Pipeline YAML 配置</strong> 即可表达，分支与循环均以简洁的声明方式完成，避免了繁琐的手动编码。
             </p>
 
             <div class="item">
@@ -220,12 +227,14 @@
           <div class="content has-text-justified">
             <p>
               对 UltraRAG 2.0 而言，“简”并不意味着功能受限。借助 MCP 架构与灵活的 YAML 流程定义，UltraRAG 2.0
-              为科研人员提供了一个高性能、可扩展的实验平台。研究者可以在极短时间内搭建出类似 DeepResearch 的多阶段推理系统，支持动态检索、条件判断、多轮交互等高级能力。
+              为科研人员提供了一个高性能、可扩展的实验平台。<strong>研究者可以在极短时间内搭建出类似 DeepResearch
+                的多阶段推理系统</strong>，支持<strong>动态检索、条件判断、多轮交互等高级能力</strong>。
             </p>
 
             <p>
-              在示例中，我们将 Retriever、Generation、Router 等模块通过 YAML 串联，构建了一个同时具备循环与条件分支的推理流程，实现了 Plan 生成 → 知识整理 →
-              子问题生成等关键步骤，而这一切仅需不到 100 行代码（详见 examples/webnote.yaml）。
+              在示例中，我们将 <strong>Retriever、Generation、Router</strong> 等模块通过 YAML 串联，构建了一个同时具备循环与条件分支的推理流程，实现了 <strong>Plan
+                生成 →
+                知识整理 → 子问题生成</strong>等关键步骤，而这一切仅需 <strong>不到 100 行代码</strong>。
             </p>
 
             <div class="item">
@@ -237,7 +246,7 @@
             </div>
 
             <p>
-              在性能上，该系统在复杂多跳问题上，相较 Vanilla RAG 性能提升约 12%，充分验证了 UltraRAG 2.0 在快速构建复杂推理系统方面的潜力。
+              在性能上，该系统在复杂多跳问题上，相较 Vanilla RAG <strong>性能提升约 12%</strong>，充分验证了 UltraRAG 2.0 在快速构建复杂推理系统方面的潜力。
             </p>
 
             <div class="item">
@@ -444,13 +453,17 @@
           <h2 class="title is-3">秘诀：MCP 架构与原生流程控制</h2>
           <div class="content has-text-justified">
             <p>
-              在不同的 RAG 系统中，检索、生成等核心能力在功能上具有高度相似性，但由于开发者实现策略各异，模块之间往往缺乏统一接口，难以跨项目复用。Model Context Protocol (MCP)
-              作为一种开放协议，规范了为大型语言模型（LLMs）提供上下文的标准方式，并采用 Client–Server 架构，使得遵循该协议开发的 Server 组件可以在不同系统间无缝复用。
+              在不同的 RAG 系统中，检索、生成等核心能力在功能上具有高度相似性，但由于开发者实现策略各异，模块之间往往缺乏统一接口，难以跨项目复用。<a
+                href="https://modelcontextprotocol.io/overview" target="_blank">Model Context Protocol (MCP)</a>
+              作为一种开放协议，规范了为大型语言模型（LLMs）提供上下文的标准方式，并采用 <strong>Client–Server 架构</strong>，使得遵循该协议开发的 Server
+              组件可以在不同系统间无缝复用。
             </p>
 
             <p>
-              受此启发，UltraRAG 2.0 基于 MCP 架构，将 RAG 系统中的检索、生成、评测等核心功能抽象并封装为相互独立的 MCP Server，并通过标准化的函数级 Tool
-              接口实现调用。这一设计既保证了模块功能扩展的灵活性，又允许新模块以“热插拔”的方式接入，无需对全局代码进行侵入式修改。在科研场景中，这种架构让研究者能够以极低的代码量快速适配新的模型或算法，同时保持整体系统的稳定性与一致性。
+              受此启发，UltraRAG 2.0 基于 <strong>MCP 架构</strong>，将 RAG 系统中的检索、生成、评测等核心功能抽象并封装为相互独立的 <strong>MCP
+                Server</strong>，并通过标准化的 <strong>函数级 Tool
+                接口</strong>
+              实现调用。这一设计既保证了模块功能扩展的灵活性，又允许新模块以“热插拔”的方式接入，无需对全局代码进行侵入式修改。在科研场景中，这种架构让研究者能够以极低的代码量快速适配新的模型或算法，同时保持整体系统的稳定性与一致性。
             </p>
 
             <div class="item">
@@ -463,18 +476,20 @@
             </div>
 
             <p>
-              复杂 RAG 推理框架的开发具有显著挑战，而 UltraRAG 2.0 之所以能够在低代码条件下支持复杂系统的构建，核心在于其底层对多结构 Pipeline
-              流程控制的原生支持。无论是串行、循环还是条件分支，所有控制逻辑均可在 YAML 层完成定义与调度，覆盖复杂推理任务所需的多种流程表达方式。在实际运行中，推理流程的调度由内置 Client
-              执行，其逻辑完全由用户编写的外部 Pipeline YAML 脚本描述，从而实现与底层实现的解耦。开发者可以像使用编程语言关键字一样调用 loop、step 等指令，以声明式方式快速构建多阶段推理流程。
+              复杂 RAG 推理框架的开发具有显著挑战，而 UltraRAG 2.0 之所以能够在 <strong>低代码</strong> 条件下支持复杂系统的构建，核心在于其底层对多结构 <strong>Pipeline
+                流程控制</strong> 的原生支持。无论是 <strong>串行、循环</strong>还是<strong>条件分支</strong>，所有控制逻辑均可在 <strong>YAML
+                层</strong>完成定义与调度，覆盖复杂推理任务所需的多种流程表达方式。在实际运行中，推理流程的调度由内置 <strong>Client</strong>
+              执行，其逻辑完全由用户编写的外部 <strong>Pipeline YAML 脚本</strong> 描述，从而实现与底层实现的解耦。开发者可以像使用编程语言关键字一样调用 loop、step
+              等指令，以声明式方式快速构建多阶段推理流程。
             </p>
 
             <p>
-              通过将 MCP 架构 与 原生流程控制深度融合，UltraRAG 2.0 让复杂 RAG 系统的搭建像“编排流程”一样自然高效。此外，框架内置 17 个主流 benchmark 任务与多种高质量
-              baseline，配合统一的评测体系与知识库支持，进一步提升了系统开发的效率与实验的可复现性。
+              通过将 <strong>MCP 架构</strong> 与 <strong>原生流程控制</strong> 深度融合，UltraRAG 2.0 让复杂 RAG 系统的搭建像“编排流程”一样自然高效。此外，框架内置
+              <strong>17 个主流 benchmark</strong> 任务与多种高质量 Baseline，配合统一的评测体系与知识库支持，进一步提升了系统开发的效率与实验的可复现性。
             </p>
 
             <p>
-              👉 欢迎访问<a href="https://ur.xinhaidong.top">教程文档</a>快速上手 UltraRAG 2.0！
+              <strong>👉 欢迎访问<a href="https://ur.xinhaidong.top">教程文档</a>快速上手 UltraRAG 2.0！</strong>
             </p>
 
           </div>
