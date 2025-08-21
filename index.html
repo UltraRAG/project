@@ -47,7 +47,7 @@
 </head>
 
 <body>
-  <section class="hero hero-landing">
+  <section class="hero hero-landing" style="padding-bottom:1.25rem;">
     <div class="hero-body">
       <div class="container is-max-desktop">
         <div class="columns is-centered">
@@ -95,7 +95,7 @@
   </section>
 
   <!-- Intro -->
-  <section class="section hero card-section">
+  <section class="section hero card-section" style="padding-top:2rem;">
     <div class="container is-max-desktop">
       <div class="columns is-centered has-text-centered">
         <div class="column is-four-fifths">
@@ -513,33 +513,55 @@
   <!--End BibTex citation -->
 
 
-  <footer class="footer">
+  <footer class="footer"
+    style="background: var(--ur-bg); color: var(--ur-muted); border-top: 1px solid #e5e7eb; padding:.85rem 0;">
     <div class="container">
-      <div class="columns is-centered">
-        <div class="column is-8">
-          <div class="content">
-
-            <p>
-              This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template"
-                target="_blank">Academic Project Page Template</a> which was adopted from the <a
-                href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
-              You are free to borrow the source code of this website, we just ask that you link back to this page in the
-              footer. <br> This website is licensed under a <a rel="license"
-                href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
-                Commons Attribution-ShareAlike 4.0 International License</a>.
-            </p>
-
+      <div class="columns is-vcentered is-variable is-6">
+        <!-- Left: icon links only -->
+        <div class="column is-6">
+          <div class="buttons" style="margin-bottom:0;">
+            <a class="button is-normal is-light" href="https://github.com/OpenBMB/UltraRAG" target="_blank"
+              aria-label="GitHub" style="color: inherit;">
+              <span class="icon"><i class="fab fa-github"></i></span>
+              <span>GitHub</span>
+            </a>
+            <a class="button is-normal is-light" href="https://ur.xinhaidong.top" target="_blank" aria-label="Docs"
+              style="color: inherit;">
+              <span class="icon"><i class="fas fa-book"></i></span>
+              <span>Docs</span>
+            </a>
+            <a class="button is-normal is-light" href="https://huggingface.co/datasets/msss123/msssssragdata123123"
+              target="_blank" aria-label="Dataset" style="color: inherit;">
+              <span class="icon">🤗</span>
+              <span>Dataset</span>
+            </a>
           </div>
+        </div>
+
+        <!-- Right: copyright line -->
+        <div class="column is-6 has-text-right">
+          <p class="is-size-7 has-text-grey" style="margin-bottom:.5rem;">
+            UltraRAG <i class="far fa-copyright" aria-hidden="true"></i> <span id="footer-year">2025</span>，OpenBMB 版权所有
+          </p>
         </div>
       </div>
     </div>
   </footer>
-
   <!-- Statcounter tracking code -->
 
   <!-- You can add a tracker to track page visits by creating an account at statcounter.com -->
 
   <!-- End of Statcounter Code -->
+
+  <script>
+    (function () {
+      try {
+        var y = new Date().getFullYear();
+        var yearEl = document.getElementById('footer-year');
+        if (yearEl) yearEl.textContent = y;
+      } catch (e) { }
+    })();
+  </script>
 
 </body>
 
