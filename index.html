@@ -43,6 +43,46 @@
   <script src="static/js/bulma-slider.min.js"></script>
   <script src="static/js/index.js"></script>
   <!-- <style></style> -->
+  <style>
+    /* 放大整体容器（Bulma 的 widescreen 默认≈1216px，这里改为 1440px） */
+    :root { --ur-container-max: 1440px; }
+    .container.is-max-widescreen { max-width: var(--ur-container-max); }
+
+    /* 让原本 is-four-fifths 的内容在桌面端占满一整行 */
+    @media (min-width: 1024px) {
+      .column.is-full { flex: 0 0 100%; width: 100%; }
+    }
+
+    /* 让 case 两列之间的间距略小，卡片实际可用宽度更大 */
+    .columns.is-variable.is-5 { --columnGap: 1.25rem; }
+
+    /* Light-gray outer frame for the case area; keep inner cards white */
+    .ur-case-wrap {
+      background: #f7f8fa;          /* subtle light gray */
+      border: 1px solid #e5e7eb;    /* thin light border */
+      border-radius: 12px;
+      padding: 1rem 1rem .5rem;     /* space around the two cards */
+      margin-top: .75rem;           /* gap from the image above */
+      box-shadow: 0 2px 8px rgba(17,24,39,0.04);
+    }
+
+    /* Keep inner case cards white on light gray wrapper */
+    .ur-case-wrap .box {
+      background-color: #fff;
+    }
+
+    /* Light-gray wrapper for code compare area; keep cards white */
+    .ur-code-wrap {
+      background: #f7f8fa;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 1rem 1rem 1rem;
+      margin-top: .75rem;
+      box-shadow: 0 2px 8px rgba(17,24,39,0.04);
+    }
+    .ur-code-wrap .code-card { background: #fff; }
+  </style>
+
 </head>
 
 <body>
@@ -84,6 +124,14 @@
                     <span>数据集</span>
                   </a>
                 </span>
+                <span class="link-block">
+                  <a href="index_en.html" class="external-link button is-normal is-rounded">
+                    <span class="icon">
+                      <i class="fas fa-language"></i>
+                    </span>
+                    <span>English</span>
+                  </a>
+                </span>
               </div>
             </div>
           </div>
@@ -96,7 +144,7 @@
   <section class="section hero card-section" style="padding-top:0rem;">
     <div class="container is-max-desktop">
       <div class="columns is-centered has-text-centered">
-        <div class="column is-four-fifths">
+        <div class="column is-full">
           <h2 class="title is-3">UltraRAG 2.0：面向科研的“RAG实验”加速器</h2>
           <div class="content has-text-justified">
             <p>
@@ -132,7 +180,7 @@
   <section class="section hero card-section">
     <div class="container is-max-desktop">
       <div class="columns is-centered has-text-centered">
-        <div class="column is-four-fifths">
+        <div class="column is-full">
           <h2 class="title is-3">大道至简：让科研实验专注思想而非工程</h2>
           <div class="content has-text-justified">
             <p>
@@ -142,7 +190,7 @@
             </p>
 
             <div class="item">
-              <div class="columns is-variable is-6 is-multiline" style="align-items:center;">
+              <div class="columns is-variable is-5 is-multiline" style="align-items:center;">
                 <div class="column is-6">
                   <img src="static/images/code_lines_total.svg" alt="不同框架代码行数总览"
                     style="display:block; width:100%; height:auto; border-radius:12px; box-shadow: 0 10px 20px rgba(0,0,0,.06);" />
@@ -215,7 +263,8 @@
   }
 </style>
 
-<div class="code-compare">
+<div class="ur-code-wrap">
+  <div class="code-compare">
   <!-- 左：FlashRAG (Python) -->
   <section class="code-card" aria-label="FlashRAG code">
     <div class="code-card__header">
@@ -253,7 +302,7 @@ for local_idx, item_id in enumerate(active_item_ids):
     if "so the answer is" not in thought.lower():
         next_active.append(item_id)
 
-# [E] 仅继续未完成
+# [E] 对未完成样本继续
 active_item_ids = next_active</code></pre>
     </div>
   </section>
@@ -268,8 +317,10 @@ active_item_ids = next_active</code></pre>
       </div>
     </div>
     <div class="code-card__body" role="region" aria-label="UltraRAG source code">
-      <pre><code class="language-yaml">
-# [A]~[B] 由上游节点批量生成 ans_ls
+      <pre><code class="language-yaml"># [A] 批量构造提示
+- prompt.ircot_next_prompt
+# [B] 批量生成
+- generation.generate
 - branch:
     router:
     # [C][D] 判定 state=complete/incomplete
@@ -281,8 +332,9 @@ active_item_ids = next_active</code></pre>
       complete: []</code></pre>
     </div>
   </section>
+  </div>
 </div>
-<h2 class="subtitle has-text-centered">FlashRAG 与 UltraRAG 的代码实现对比</h2>
+<h2 class="subtitle has-text-centered" style="margin-top:.5rem;">FlashRAG 与 UltraRAG 的代码实现对比</h2>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
@@ -302,7 +354,7 @@ active_item_ids = next_active</code></pre>
   <section class="section hero card-section">
     <div class="container is-max-desktop">
       <div class="columns is-centered has-text-centered">
-        <div class="column is-four-fifths">
+        <div class="column is-full">
           <h2 class="title is-3">简而不凡：数十行代码实现高性能RAG系统</h2>
           <div class="content has-text-justified">
             <p>
@@ -339,11 +391,12 @@ active_item_ids = next_active</code></pre>
             </div>
 
             <p>
-              以下展示的是我们构建的示例系统在小红书平台上针对两个真实用户提问所生成的案例。
+              以下展示的是我们构建的示例系统在小红书平台上针对两个真实用户提问所生成的案例：
             </p>
 
             <!-- Case -->
-            <div class="columns is-variable is-6 is-multiline">
+            <div class="ur-case-wrap">
+              <div class="columns is-variable is-5 is-multiline">
               <!-- Case 1 -->
               <div class="column is-6">
                 <article class="box" style="height:100%;">
@@ -395,25 +448,25 @@ active_item_ids = next_active</code></pre>
 
                     <h5 class="title is-6">Reference</h5>
                     <ol>
-                      <li id="case1-ref-1">知乎. (2024). 电子信息工程专业真的不好就业吗？. <a
-                          href="https://www.zhihu.com/question/379809384" target="_blank">链接</a></li>
-                      <li id="case1-ref-2">腾讯云开发者社区. (2023). 电子信息工程专业就业前景与方向分析. <a
-                          href="https://cloud.tencent.com/developer/article/2301309" target="_blank">链接</a></li>
-                      <li id="case1-ref-3">牛客网. (2024). 2025届秋招备战攻略，一份超全指南！. <a
-                          href="https://www.nowcoder.com/discuss/602905307584163840" target="_blank">链接</a></li>
-                      <li id="case1-ref-4">智联招聘. (2024). 2024年大学生就业力调研报告. <a
-                          href="https://www.zhaopin.com/report/20240325/214310.html" target="_blank">链接</a></li>
-                      <li id="case1-ref-5">CSDN博客. (2023). 电子信息工程专业就业方向. <a
-                          href="https://blog.csdn.net/qq_45690333/article/details/130799468" target="_blank">链接</a></li>
-                      <li id="case1-ref-6">知乎. (2023). 电子信息工程除了做程序员和考公，还有什么出路？. <a
-                          href="https://www.zhihu.com/question/552837332" target="_blank">链接</a></li>
-                      <li id="case1-ref-7">中公教育. (2024). 应届生秋招简历怎么写？. <a
-                          href="https://www.offcn.com/yjianli/234902.html" target="_blank">链接</a></li>
-                      <li id="case1-ref-8">哔哩哔哩. (2024). 简历上没有项目经历怎么办？5种方法帮你解决！. <a
-                          href="https://www.bilibili.com/read/cv34250325/" target="_blank">链接</a></li>
-                      <li id="case1-ref-9">简书. (2022). 秋招焦虑？找不到工作？应届生求职心态全攻略. <a
-                          href="https://www.jianshu.com/p/e3f6d7c7e0f8" target="_blank">链接</a></li>
-                      <li id="case1-ref-10">知乎. (2023). 秋招焦虑到爆炸怎么办？. <a href="https://www.zhihu.com/question/620456235"
+                      <li id="case1-ref-1">24届电子信息应届硕士生秋招+春招心得与感悟 - CSDN博客. <a
+                          href="https://blog.csdn.net/hu_yinghui/article/details/140604878" target="_blank">链接</a></li>
+                      <li id="case1-ref-2">电子信息（0854）专业学位12个领域详解与就业去向 - 微信公众号. <a
+                          href="http://mp.weixin.qq.com/s?__biz=MzU3OTY5ODc5MA==&mid=2247509014&idx=8&sn=a355538b27e253b49d527b3491386700" target="_blank">链接</a></li>
+                      <li id="case1-ref-3">毕业季 | Dream offer 这样拿！ - 微信公众号. <a
+                          href="http://mp.weixin.qq.com/s?__biz=Mzg4MzU1NDI2MA==&mid=2247568287&idx=1&sn=f4519216329e54646f9a485490f4217a" target="_blank">链接</a></li>
+                      <li id="case1-ref-4">筑梦研途｜南航研究生求职故事 - 微信公众号. <a
+                          href="http://mp.weixin.qq.com/s?__biz=MzA3NzM1MjYyMQ%3D%3D&chksm=85080417ceacd3e3f6b246b7a274cdd83ea658d72ebfa50c5776f8deac65f6072c5e15d7091b&idx=1&mid=2654522009&scene=27&sn=98102ec08bb47329b3ce855833eb4194" target="_blank">链接</a></li>
+                      <li id="case1-ref-5">成功签约最重要的是什么？如何拿下令人心动的offer…中南大学学子就业经验分享 - MBAChina网. <a
+                          href="http://mbachina.com/html/mbachina/20250505/611588.html" target="_blank">链接</a></li>
+                      <li id="case1-ref-6">【就业先锋】2025届毕业生程惠甜：筑梦起航，奋斗正当时 - 杭州电子科技大学材料与环境工程学院. <a
+                          href="http://cmee.hdu.edu.cn/2024/1223/c4767a273992/page.htm" target="_blank">链接</a></li>
+                      <li id="case1-ref-7">非科班转码，勤勤恳恳自学三年，为什么秋招0offer，颗粒无收！- 牛客网. <a
+                          href="http://nowcoder.com/discuss/700044492660805632" target="_blank">链接</a></li>
+                      <li id="case1-ref-8">毕业季 | Dream offer 这样拿！ - 微信公众号. <a
+                          href="http://mp.weixin.qq.com/s?__biz=Mzg4MzU1NDI2MA==&mid=2247568287&idx=1&sn=f4519216329e54646f9a485490f4217a" target="_blank">链接</a></li>
+                      <li id="case1-ref-9">筑梦研途｜南航研究生求职故事 - 微信公众号. <a
+                          href="http://mp.weixin.qq.com/s?__biz=MzA3NzM1MjYyMQ%3D%3D&chksm=85080417ceacd3e3f6b246b7a274cdd83ea658d72ebfa50c5776f8deac65f6072c5e15d7091b&idx=1&mid=2654522009&scene=27&sn=98102ec08bb47329b3ce855833eb4194" target="_blank">链接</a></li>
+                      <li id="case1-ref-10">24届电子信息应届硕士生秋招+春招心得与感悟 - CSDN博客. <a href="https://blog.csdn.net/hu_yinghui/article/details/140604878"
                           target="_blank">链接</a></li>
                     </ol>
                   </div>
@@ -484,37 +537,38 @@ active_item_ids = next_active</code></pre>
 
                     <h5 class="title is-6">Reference</h5>
                     <ol>
-                      <li id="case2-ref-1">全军士官学校名录、简介及王牌专业介绍 - 湖南招生考试信息港. (2024). <a
-                          href="https://www.hneeb.cn/hnxxg/gkxw/202405/20240523_96285.html" target="_blank">链接</a></li>
-                      <li id="case2-ref-2">定向培养士官招生相关政策解答 - 中华人民共和国教育部. (2021). <a
-                          href="http://www.moe.gov.cn/jyb_xwfb/xw_zt/moe_838/2021_zt/2021_zsgz/zsgz_zcwj/202106/t20210609_536830.html"
+                      <li id="case2-ref-1">士官学校冷门原因及转军校可能性解析 - 乐见教育. <a
+                          href="http://m.letianedu.cn/article/c6013741a07bd897.html" target="_blank">链接</a></li>
+                      <li id="case2-ref-2">定向培养军士和上完大专当兵有什么不同 - 智优志愿服务. <a
+                          href="http://mp.weixin.qq.com/s?__biz=MwMjE1Mzk0MA==&mid=2648230877&idx=4&sn=a0a0cfc3cab3270d711ceea6ed0f521c"
                           target="_blank">链接</a></li>
-                      <li id="case2-ref-3">2024年定向培养军士招生政策问答 - 中华人民共和国国防部. (2024). <a
-                          href="http://www.mod.gov.cn/gfbw/wzll/244365.html" target="_blank">链接</a></li>
-                      <li id="case2-ref-4">士官学校和军官学校有什么区别？ - 知乎. (2023). <a
-                          href="https://www.zhihu.com/question/20328723" target="_blank">链接</a></li>
-                      <li id="case2-ref-5">定向培养士官值得报考吗?有什么优缺点? - 腾讯新闻. (2024). <a
+                      <li id="case2-ref-3">高考后，直招士官学校是一个好选择？ - 搜狐. <a
+                          href="http://sohu.com/a/482188983_120260761" target="_blank">链接</a></li>
+                      <li id="case2-ref-4">大学毕业后参军的几大优势！（专科&本科） - 军界PLA. <a
+                          href="http://mp.weixin.qq.com/s?__biz=Mzg5NzU0Njc2Ng==&mid=2247508039&idx=1&sn=70607b30cf7c4bfdbfa5a706a68ce7c2" target="_blank">链接</a></li>
+                      <li id="case2-ref-5">定向培养士官值得报考吗?有什么优缺点? - 腾讯新闻. <a
                           href="https://new.qq.com/omn/20240510/20240510A00Y4G00.html" target="_blank">链接</a></li>
-                      <li id="case2-ref-6">定向士官学校的利弊是什么 - 高三网. (2024). <a
-                          href="https://www.gaosan.com/gaokao/239198.html" target="_blank">链接</a></li>
-                      <li id="case2-ref-7">定向培养士官，你关心的问题都在这里 - 中华人民共和国国防部. (2022). <a
-                          href="http://www.mod.gov.cn/gfbw/wzll/203494.html" target="_blank">链接</a></li>
-                      <li id="case2-ref-8">高考志愿填报：定向培养士官，家境普通、成绩一般的考生可以考虑 - 腾讯网. (2021). <a
-                          href="https://new.qq.com/omn/20210626/20210626A0108A00.html" target="_blank">链接</a></li>
-                      <li id="case2-ref-9">定向培养士官适合什么样的孩子？ - 知乎. (2022). <a
-                          href="https://www.zhihu.com/question/467652083" target="_blank">链接</a></li>
-                      <li id="case2-ref-10">从定向培养军士的真实经历，来告诉你，到底值不值得报考 - 网易. (2023). <a
-                          href="https://www.163.com/dy/article/I14L28KF0552ES4E.html" target="_blank">链接</a></li>
-                      <li id="case2-ref-11">我是定向培养士官生，我来和大家谈谈我的感受 - 知乎. (2022). <a
-                          href="https://zhuanlan.zhihu.com/p/533446098" target="_blank">链接</a></li>
-                      <li id="case2-ref-12">如何报考定向培养士官生？ - 湖南省人民政府. (2022). <a
-                          href="https://www.hunan.gov.cn/hnszf/szf/jynr/jyyw/202208/t20220826_27830571.html"
+                      <li id="case2-ref-6">武警定向培养士官政策解答 - 辽宁省交通高等专科学校学生管理处. <a
+                          href="http://www.lncc.edu.cn/xsc/info/1017/2054.htm" target="_blank">链接</a></li>
+                      <li id="case2-ref-7">定向士官淘汰率多高？最新官方数据与淘汰情形 - 掌上高考. <a
+                          href="https://m.gaokao.cn/news/2025/0312/2039.html" target="_blank">链接</a></li>
+                      <li id="case2-ref-8">定向士官培养期间淘汰率与常见淘汰原因 - 瀚博招生网. <a
+                          href="https://www.hbzhaosheng.com/article/202407155740.html" target="_blank">链接</a></li>
+                      <li id="case2-ref-9">同是入伍，定向士官与义务兵的四个不同 - 微信公众号“从宇升学规划”. <a
+                          href="https://mp.weixin.qq.com/s?__biz=MzkyOTk2MTY3Nw==&mid=2247485123&idx=2&sn=8f7c6a0a6f4c5d4b2e0e6b98f2c7b2e6" target="_blank">链接</a></li>
+                      <li id="case2-ref-10">高考300-450的逆袭路：定向士官 vs 大专当兵 - 搜狐. <a
+                          href="https://www.sohu.com/a/804123456_121124715" target="_blank">链接</a></li>
+                      <li id="case2-ref-11">一次说清楚，大学毕业后当兵的三大优势！！！ - 锦州军创. <a
+                          href="http://mp.weixin.qq.com/s?__biz=MzU1ODM4NTg4Nw==&mid=2247492932&idx=3&sn=585275a2cfdaeadee82c18ac82eb00ac" target="_blank">链接</a></li>
+                      <li id="case2-ref-12">士官学校毕业去哪儿？解析技术岗、管理岗与跨军种分配 - 领航教育. <a
+                          href="http://lxjedu.com/sys-nd/3408.html"
                           target="_blank">链接</a></li>
-                      <li id="case2-ref-13">@高考生，2024年定向培养军士招收工作全面展开 - 中华人民共和国国防部. (2024). <a
-                          href="http://www.mod.gov.cn/gfbw/plfx/244497.html" target="_blank">链接</a></li>
+                      <li id="case2-ref-13">军考辅导：考士官学校是不是比军官学校容易一些？ - 哔哩哔哩. <a
+                          href="http://bilibili.com/read/cv28662363" target="_blank">链接</a></li>
                     </ol>
                   </div>
                 </article>
+              </div>
               </div>
             </div>
             <h2 class="subtitle has-text-centered">示例系统生成案例</h2>
@@ -534,7 +588,7 @@ active_item_ids = next_active</code></pre>
   <section class="section hero card-section">
     <div class="container is-max-desktop">
       <div class="columns is-centered has-text-centered">
-        <div class="column is-four-fifths">
+        <div class="column is-full">
           <h2 class="title is-3">秘诀：MCP 架构与原生流程控制</h2>
           <div class="content has-text-justified">
             <p>
@@ -564,7 +618,7 @@ active_item_ids = next_active</code></pre>
               复杂 RAG 推理框架的开发具有显著挑战，而 UltraRAG 2.0 之所以能够在 <strong>低代码</strong> 条件下支持复杂系统的构建，核心在于其底层对多结构 <strong>Pipeline
                 流程控制</strong> 的原生支持。无论是 <strong>串行、循环</strong>还是<strong>条件分支</strong>，所有控制逻辑均可在 <strong>YAML
                 层</strong>完成定义与调度，覆盖复杂推理任务所需的多种流程表达方式。在实际运行中，推理流程的调度由内置 <strong>Client</strong>
-              执行，其逻辑完全由用户编写的外部 <strong>Pipeline YAML 脚本</strong> 描述，从而实现与底层实现的解耦。开发者可以像使用编程语言关键字一样调用 loop、step
+              执行，其逻辑完全由用户编写的外部 <strong>Pipeline YAML 脚本</strong> 描述，从而完成与底层实现的解耦。开发者可以像使用编程语言关键字一样调用 loop、step
               等指令，以声明式方式快速构建多阶段推理流程。
             </p>
 
@@ -626,7 +680,7 @@ active_item_ids = next_active</code></pre>
         <!-- Right: copyright line -->
         <div class="column is-6 has-text-right">
           <p class="is-size-7 has-text-grey" style="margin-bottom:.5rem;">
-            UltraRAG <i class="far fa-copyright" aria-hidden="true"></i> <span id="footer-year">2025</span>，OpenBMB 版权所有
+            UltraRAG <i class="far fa-copyright" aria-hidden="true"></i> <span id="footer-year">2025</span>
           </p>
         </div>
       </div>
