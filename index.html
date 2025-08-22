@@ -43,6 +43,46 @@
   <script src="static/js/bulma-slider.min.js"></script>
   <script src="static/js/index.js"></script>
   <!-- <style></style> -->
+  <style>
+    /* 放大整体容器（Bulma 的 widescreen 默认≈1216px，这里改为 1440px） */
+    :root { --ur-container-max: 1440px; }
+    .container.is-max-widescreen { max-width: var(--ur-container-max); }
+
+    /* 让原本 is-four-fifths 的内容在桌面端占满一整行 */
+    @media (min-width: 1024px) {
+      .column.is-full { flex: 0 0 100%; width: 100%; }
+    }
+
+    /* 让 case 两列之间的间距略小，卡片实际可用宽度更大 */
+    .columns.is-variable.is-5 { --columnGap: 1.25rem; }
+
+    /* Light-gray outer frame for the case area; keep inner cards white */
+    .ur-case-wrap {
+      background: #f7f8fa;          /* subtle light gray */
+      border: 1px solid #e5e7eb;    /* thin light border */
+      border-radius: 12px;
+      padding: 1rem 1rem .5rem;     /* space around the two cards */
+      margin-top: .75rem;           /* gap from the image above */
+      box-shadow: 0 2px 8px rgba(17,24,39,0.04);
+    }
+
+    /* Keep inner case cards white on light gray wrapper */
+    .ur-case-wrap .box {
+      background-color: #fff;
+    }
+
+    /* Light-gray wrapper for code compare area; keep cards white */
+    .ur-code-wrap {
+      background: #f7f8fa;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 1rem 1rem 1rem;
+      margin-top: .75rem;
+      box-shadow: 0 2px 8px rgba(17,24,39,0.04);
+    }
+    .ur-code-wrap .code-card { background: #fff; }
+  </style>
+
 </head>
 
 <body>
@@ -96,7 +136,7 @@
   <section class="section hero card-section" style="padding-top:0rem;">
     <div class="container is-max-desktop">
       <div class="columns is-centered has-text-centered">
-        <div class="column is-four-fifths">
+        <div class="column is-full">
           <h2 class="title is-3">UltraRAG 2.0：面向科研的“RAG实验”加速器</h2>
           <div class="content has-text-justified">
             <p>
@@ -132,7 +172,7 @@
   <section class="section hero card-section">
     <div class="container is-max-desktop">
       <div class="columns is-centered has-text-centered">
-        <div class="column is-four-fifths">
+        <div class="column is-full">
           <h2 class="title is-3">大道至简：让科研实验专注思想而非工程</h2>
           <div class="content has-text-justified">
             <p>
@@ -142,7 +182,7 @@
             </p>
 
             <div class="item">
-              <div class="columns is-variable is-6 is-multiline" style="align-items:center;">
+              <div class="columns is-variable is-5 is-multiline" style="align-items:center;">
                 <div class="column is-6">
                   <img src="static/images/code_lines_total.svg" alt="不同框架代码行数总览"
                     style="display:block; width:100%; height:auto; border-radius:12px; box-shadow: 0 10px 20px rgba(0,0,0,.06);" />
@@ -215,7 +255,8 @@
   }
 </style>
 
-<div class="code-compare">
+<div class="ur-code-wrap">
+  <div class="code-compare">
   <!-- 左：FlashRAG (Python) -->
   <section class="code-card" aria-label="FlashRAG code">
     <div class="code-card__header">
@@ -281,8 +322,9 @@ active_item_ids = next_active</code></pre>
       complete: []</code></pre>
     </div>
   </section>
-</div>
+  </div>
 <h2 class="subtitle has-text-centered">FlashRAG 与 UltraRAG 的代码实现对比</h2>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
@@ -302,7 +344,7 @@ active_item_ids = next_active</code></pre>
   <section class="section hero card-section">
     <div class="container is-max-desktop">
       <div class="columns is-centered has-text-centered">
-        <div class="column is-four-fifths">
+        <div class="column is-full">
           <h2 class="title is-3">简而不凡：数十行代码实现高性能RAG系统</h2>
           <div class="content has-text-justified">
             <p>
@@ -343,7 +385,8 @@ active_item_ids = next_active</code></pre>
             </p>
 
             <!-- Case -->
-            <div class="columns is-variable is-6 is-multiline">
+            <div class="ur-case-wrap">
+              <div class="columns is-variable is-5 is-multiline">
               <!-- Case 1 -->
               <div class="column is-6">
                 <article class="box" style="height:100%;">
@@ -516,6 +559,7 @@ active_item_ids = next_active</code></pre>
                   </div>
                 </article>
               </div>
+              </div>
             </div>
             <h2 class="subtitle has-text-centered">示例系统生成案例</h2>
 
@@ -534,7 +578,7 @@ active_item_ids = next_active</code></pre>
   <section class="section hero card-section">
     <div class="container is-max-desktop">
       <div class="columns is-centered has-text-centered">
-        <div class="column is-four-fifths">
+        <div class="column is-full">
           <h2 class="title is-3">秘诀：MCP 架构与原生流程控制</h2>
           <div class="content has-text-justified">
             <p>
