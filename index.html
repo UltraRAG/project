@@ -294,7 +294,7 @@ for local_idx, item_id in enumerate(active_item_ids):
     if "so the answer is" not in thought.lower():
         next_active.append(item_id)
 
-# [E] 仅继续未完成
+# [E] 对未完成样本继续
 active_item_ids = next_active</code></pre>
     </div>
   </section>
@@ -309,8 +309,10 @@ active_item_ids = next_active</code></pre>
       </div>
     </div>
     <div class="code-card__body" role="region" aria-label="UltraRAG source code">
-      <pre><code class="language-yaml">
-# [A]~[B] 由上游节点批量生成 ans_ls
+      <pre><code class="language-yaml"># [A] 批量构造提示
+- prompt.ircot_next_prompt
+# [B] 批量生成
+- generation.generate
 - branch:
     router:
     # [C][D] 判定 state=complete/incomplete
@@ -608,7 +610,7 @@ active_item_ids = next_active</code></pre>
               复杂 RAG 推理框架的开发具有显著挑战，而 UltraRAG 2.0 之所以能够在 <strong>低代码</strong> 条件下支持复杂系统的构建，核心在于其底层对多结构 <strong>Pipeline
                 流程控制</strong> 的原生支持。无论是 <strong>串行、循环</strong>还是<strong>条件分支</strong>，所有控制逻辑均可在 <strong>YAML
                 层</strong>完成定义与调度，覆盖复杂推理任务所需的多种流程表达方式。在实际运行中，推理流程的调度由内置 <strong>Client</strong>
-              执行，其逻辑完全由用户编写的外部 <strong>Pipeline YAML 脚本</strong> 描述，从而实现与底层实现的解耦。开发者可以像使用编程语言关键字一样调用 loop、step
+              执行，其逻辑完全由用户编写的外部 <strong>Pipeline YAML 脚本</strong> 描述，从而完成与底层实现的解耦。开发者可以像使用编程语言关键字一样调用 loop、step
               等指令，以声明式方式快速构建多阶段推理流程。
             </p>
 
