@@ -622,6 +622,105 @@ active_item_ids = next_active</code></pre>
               等指令，以声明式方式快速构建多阶段推理流程。
             </p>
 
+            <!-- 三种流程示例：顺序 / 循环 / 分支 -->
+            <style>
+              /* 三列代码卡片布局；窄屏自动折行 */
+              .code-compare--3 {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 1.25rem;
+                align-items: start;
+              }
+              @media (max-width: 1200px) { .code-compare--3 { grid-template-columns: 1fr 1fr; } }
+              @media (max-width: 900px)  { .code-compare--3 { grid-template-columns: 1fr; } }
+            </style>
+
+            <div class="ur-code-wrap">
+              <div class="code-compare--3">
+                <!-- 顺序（Serial） -->
+                <section class="code-card" aria-label="Serial YAML example">
+                  <div class="code-card__header">
+                    <span>串行</span>
+                    <div class="code-badges">
+                      <span class="code-badge">YAML</span>
+                      <span class="code-badge">Sequential</span>
+                    </div>
+                  </div>
+                  <div class="code-card__body" role="region" aria-label="Serial YAML code">
+                    <pre><code class="language-yaml"># 串行：依次执行工具
+pipeline:
+- benchmark.get_data
+- retriever.retriever_deploy_search
+- prompt.qa_rag_boxed
+- generation.generate
+- custom.output_extract_from_boxed
+- evaluation.evaluate
+</code></pre>
+                  </div>
+                </section>
+
+                <!-- 循环（Loop） -->
+                <section class="code-card" aria-label="Loop YAML example">
+                  <div class="code-card__header">
+                    <span>循环</span>
+                    <div class="code-badges">
+                      <span class="code-badge">YAML</span>
+                      <span class="code-badge">Loop</span>
+                    </div>
+                  </div>
+                  <div class="code-card__body" role="region" aria-label="Loop YAML code">
+                    <pre><code class="language-yaml"># 循环：循环执行一组工具
+pipeline:
+- benchmark.get_data
+- retriever.retriever_init
+- loop:
+    times: 3  
+    steps: 
+      - retriever.retriever_search
+      - prompt.generate_subquery
+      - generation.generate  
+- prompt.generate_final_answer
+- generation.generate
+  </code></pre>
+                  </div>
+                </section>
+
+                <!-- 分支（Branch） -->
+                <section class="code-card" aria-label="Branch YAML example">
+                  <div class="code-card__header">
+                    <span>分支</span>
+                    <div class="code-badges">
+                      <span class="code-badge">YAML</span>
+                      <span class="code-badge">Branch-Router</span>
+                    </div>
+                  </div>
+                  <div class="code-card__body" role="region" aria-label="Branch YAML code">
+                    <pre><code class="language-yaml"># 分支：根据路由结果执行不同工具
+pipeline:
+- benchmark.get_data
+- retriever.retriever_init
+- prompt.generate_query_or_answer
+- generation.generate
+- loop:
+    times: 3         
+    steps:
+    - branch:
+        router:
+          - router.check_query_or_answer   
+        branches:
+          is_query:
+            - retriever.retriever_search
+            - prompt.generate_query_or_answer
+            - generation.generate
+          is_answer: []    
+- evaluation.evaluate
+      </code></pre>
+                  </div>
+                </section>
+              </div>
+            </div>
+            <h2 class="subtitle has-text-centered" style="margin-top:.5rem;">多结构 Pipeline 流程控制：顺序 / 循环 / 分支</h2>
+
             <p>
               通过将 <strong>MCP 架构</strong> 与 <strong>原生流程控制</strong> 深度融合，UltraRAG 2.0 让复杂 RAG 系统的搭建像“编排流程”一样自然高效。此外，框架内置
               <strong>17 个主流 benchmark</strong> 任务与多种高质量 Baseline，配合统一的评测体系与知识库支持，进一步提升了系统开发的效率与实验的可复现性。
