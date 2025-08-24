@@ -82,6 +82,32 @@
       box-shadow: 0 2px 8px rgba(17,24,39,0.04);
     }
     .ur-code-wrap .code-card { background: #fff; }
+
+    /* Line-highlight utility for code blocks (GitHub-style green) */
+.code-card pre[data-hl] { position: relative; }
+.code-card pre[data-hl]::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  /* 12px 对应你代码块预设的 padding-top */
+  top: calc(12px + (var(--hl-start, 1) - 1) * 1.55em);
+  height: calc((var(--hl-end, 1) - var(--hl-start, 1) + 1) * 1.55em);
+  background: #e6ffed;              /* 浅绿底 */
+  border-left: 3px solid #34d399;    /* 绿色侧边条 */
+  border-top: 1px solid #bbf7d0;
+  border-bottom: 1px solid #bbf7d0;
+  box-shadow: inset 0 0 0 1px rgba(16,185,129,0.08);
+  pointer-events: none;
+  z-index: 0;
+}
+.code-card pre[data-hl] code { position: relative; z-index: 1; }
+    /* Make highlight.js background transparent so the line-highlight shows fully */
+    .code-card pre code.hljs,
+    .ur-code-wrap pre code.hljs {
+      background: transparent !important;  /* override github.css white bg */
+      padding: 0 !important;               /* avoid double padding shifting the overlay */
+      display: block;                       /* ensure block so overlay width matches */
+    }
   </style>
 </head>
 
@@ -544,7 +570,7 @@ When deciding, candidates should weigh personal interests, family conditions, an
                     </div>
                   </div>
                   <div class="code-card__body" role="region" aria-label="Serial YAML code">
-                    <pre><code class="language-yaml"># Sequential: Tools are executed in order
+<pre data-hl style="--hl-start:3; --hl-end:8;"><code class="language-yaml"># Sequential: Tools are executed in order
 pipeline:
 - benchmark.get_data
 - retriever.retriever_deploy_search
@@ -566,7 +592,7 @@ pipeline:
                     </div>
                   </div>
                   <div class="code-card__body" role="region" aria-label="Loop YAML code">
-                    <pre><code class="language-yaml"># Loop: Iteratively execute a group of tools
+<pre data-hl style="--hl-start:5; --hl-end:10;"><code class="language-yaml"># Loop: Iteratively execute a group of tools
 pipeline:
 - benchmark.get_data
 - retriever.retriever_init
@@ -592,7 +618,7 @@ pipeline:
                     </div>
                   </div>
                   <div class="code-card__body" role="region" aria-label="Branch YAML code">
-                    <pre><code class="language-yaml"># Branch: Execute different tools based on routing results
+<pre data-hl style="--hl-start:10; --hl-end:18;"><code class="language-yaml"># Branch: Execute different tools based on routing results
 pipeline:
 - benchmark.get_data
 - retriever.retriever_init
