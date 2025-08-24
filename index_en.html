@@ -519,6 +519,105 @@ When deciding, candidates should weigh personal interests, family conditions, an
               Developers can call instructions like loop and step as if using programming language keywords, quickly constructing multi-stage inference workflows in a declarative manner.
             </p>
 
+                        <!-- 三种流程示例：顺序 / 循环 / 分支 -->
+            <style>
+              /* 三列代码卡片布局；窄屏自动折行 */
+              .code-compare--3 {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 1.25rem;
+                align-items: start;
+              }
+              @media (max-width: 1200px) { .code-compare--3 { grid-template-columns: 1fr 1fr; } }
+              @media (max-width: 900px)  { .code-compare--3 { grid-template-columns: 1fr; } }
+            </style>
+
+            <div class="ur-code-wrap">
+              <div class="code-compare--3">
+                <!-- 顺序（Serial） -->
+                <section class="code-card" aria-label="Serial YAML example">
+                  <div class="code-card__header">
+                    <span>Sequential</span>
+                    <div class="code-badges">
+                      <span class="code-badge">YAML</span>
+                      <span class="code-badge">Sequential</span>
+                    </div>
+                  </div>
+                  <div class="code-card__body" role="region" aria-label="Serial YAML code">
+                    <pre><code class="language-yaml"># Sequential: Tools are executed in order
+pipeline:
+- benchmark.get_data
+- retriever.retriever_deploy_search
+- prompt.qa_rag_boxed
+- generation.generate
+- custom.output_extract_from_boxed
+- evaluation.evaluate
+</code></pre>
+                  </div>
+                </section>
+
+                <!-- 循环（Loop） -->
+                <section class="code-card" aria-label="Loop YAML example">
+                  <div class="code-card__header">
+                    <span>Loop</span>
+                    <div class="code-badges">
+                      <span class="code-badge">YAML</span>
+                      <span class="code-badge">Loop</span>
+                    </div>
+                  </div>
+                  <div class="code-card__body" role="region" aria-label="Loop YAML code">
+                    <pre><code class="language-yaml"># Loop: Iteratively execute a group of tools
+pipeline:
+- benchmark.get_data
+- retriever.retriever_init
+- loop:
+    times: 3  
+    steps: 
+      - retriever.retriever_search
+      - prompt.generate_subquery
+      - generation.generate  
+- prompt.generate_final_answer
+- generation.generate
+  </code></pre>
+                  </div>
+                </section>
+
+                <!-- 分支（Branch） -->
+                <section class="code-card" aria-label="Branch YAML example">
+                  <div class="code-card__header">
+                    <span>Branch</span>
+                    <div class="code-badges">
+                      <span class="code-badge">YAML</span>
+                      <span class="code-badge">Branch-Router</span>
+                    </div>
+                  </div>
+                  <div class="code-card__body" role="region" aria-label="Branch YAML code">
+                    <pre><code class="language-yaml"># Branch: Execute different tools based on routing results
+pipeline:
+- benchmark.get_data
+- retriever.retriever_init
+- prompt.generate_query_or_answer
+- generation.generate
+- loop:
+    times: 3         
+    steps:
+    - branch:
+        router:
+          - router.check_query_or_answer   
+        branches:
+          is_query:
+            - retriever.retriever_search
+            - prompt.generate_query_or_answer
+            - generation.generate
+          is_answer: []    
+- evaluation.evaluate
+      </code></pre>
+                  </div>
+                </section>
+              </div>
+            </div>
+            <h2 class="subtitle has-text-centered" style="margin-top:.5rem;">Multi-structured Pipeline Control: Sequential, Loop, and Branching</h2>
+
             <p>
               By deeply integrating <strong>the MCP architecture</strong> with <strong>native workflow control</strong>, 
               UltraRAG 2.0 makes building complex RAG systems as natural and efficient as “orchestrating workflows.” 
@@ -526,7 +625,7 @@ When deciding, candidates should weigh personal interests, family conditions, an
               combined with a unified evaluation system and knowledge base support, further enhancing system development efficiency and experiment reproducibility.
             </p>
 
-            <p><strong>Welcome! Explore the <a href="https://ur.xinhaidong.top" target="_blank">tutorials</a> and start building with UltraRAG 2.0!</strong></p>
+            <p><strong>Explore the <a href="https://ur.xinhaidong.top" target="_blank">tutorials</a> and start building with UltraRAG 2.0!</strong></p>
           </div>
         </div>
       </div>
