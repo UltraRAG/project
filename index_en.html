@@ -205,10 +205,22 @@
           <h2 class="title is-3">Simplicity First: Focus on Ideas, Not Engineering</h2>
           <div class="content has-text-justified">
             <p>
-              The power of simplicity is best seen in practice. Take the classic <a href="https://arxiv.org/abs/2212.10509" target="_blank">IRCoT</a> method as an example:
-              the official implementation requires <strong>nearly 900 lines of handwritten logic</strong>, 
-              while FlashRAG still needs <strong>over 110 lines of code</strong>. 
-              In contrast, UltraRAG 2.0 achieves the same functionality with <strong>just 50 lines</strong>.
+              The value of simplicity becomes especially evident in practice. Take 
+              <a href="https://arxiv.org/abs/2212.10509" target="_blank">IRCoT</a>, a classic method that relies on model-generated CoT to perform multi-round retrieval until reaching a final answer—an inherently complex workflow.
+            </p>
+
+            <div class="item">
+              <!-- Your image here -->
+              <img src="static/images/ircot.png" alt="IRCoT Workflow Diagram" style="width:90%; display:block; margin:0 auto;" />
+              <h2 class="subtitle has-text-centered">
+                IRCoT Workflow
+              </h2>
+            </div>
+
+            <p>
+              Its official implementation requires <strong>nearly 900 lines of handwritten logic</strong>, and even FlashRAG still takes 
+              <strong>over 110 lines of code</strong>. In contrast, UltraRAG 2.0 achieves the same functionality with just 
+              <strong>50 lines</strong>. Notably, about half of this is merely Pipeline Yaml pseudo-code, dramatically lowering the development barrier and implementation cost.
             </p>
 
             <div class="item">
@@ -248,57 +260,104 @@
                 <section class="code-card" aria-label="FlashRAG code">
                   <div class="code-card__header">
                     <span>FlashRAG</span>
-                    <div class="code-badges"><span class="code-badge">Python</span><span class="code-badge">Batch + Loop</span></div>
+                    <div class="code-badges"><span class="code-badge">Python</span><span class="code-badge">Branch + Loop</span></div>
                   </div>
                   <div class="code-card__body" role="region" aria-label="FlashRAG source code">
-<pre><code class="language-python"># [A] Build prompts in batch
-input_prompts = [
-    tmpl.get_string(
-        question=items[i].question,
-        retrieval_result=batch_retrieval_results[i],
-        previous_gen=' '.join(batch_thoughts[i])
-    )
-    for i in active_item_ids
-]
-# [B] Batch generation
-new_thoughts = generator.generate(input_prompts, stop=['.', '\n'])
-# [C] Update + termination check
-next_active = []
-for local_idx, item_id in enumerate(active_item_ids):
-    thought = new_thoughts[local_idx]
-    batch_thoughts[item_id].append(thought)
-
-    items[item_id].update_output(
-        f'intermediate_output_iter{iter_num}',
-        {'input_prompt': input_prompts[local_idx], 'new_thought': thought}
-    )
-    # [D] Termination conditions
-    if "so the answer is" not in thought.lower():
-        next_active.append(item_id)
-# [E] Continue unfinished samples
-active_item_ids = next_active</code></pre>
+<pre><code class="language-python"># 1. Initial retrieval
+questions = [item.question for item in items]
+retrieval_results, scoress = self.retriever.batch_search(questions, return_score=True)
+for retrieval_result, scores in zip(retrieval_results,scoress):   
+    doc2score = {doc_item['id']: score for doc_item, score in zip(retrieval_result, scores)}
+    id2doc = {doc_item['id']: doc_item for doc_item in retrieval_result}
+    batch_retrieval_results.append(retrieval_result)
+    doc2score_batch.append(doc2score)
+    id2doc_batch.append(id2doc)
+# 2. Start the iterative process
+active_item_ids = list(range(len(items)))  # Track items that need more iterations
+while iter_num < self.max_iter:
+    # 3. Construct prompts
+    input_prompts = [
+        self.prompt_template.get_string(
+            question=items[item_id].question,
+            retrieval_result=batch_retrieval_results[item_id],
+            previous_gen=' '.join(batch_thoughts[item_id])
+        )
+        for item_id in active_item_ids
+    ]
+    # 4. Generate cot
+    new_thoughts_batch = self.generator.generate(input_prompts, stop=['.', '\n'])
+    # 5. determine loop or end
+    new_active_item_ids = []
+    for idx, item_id in enumerate(active_item_ids):
+        new_thought = new_thoughts_batch[idx]
+        batch_thoughts[item_id].append(new_thought)
+        items[item_id].update_output(
+                f'intermediate_output_iter{iter_num}', 
+                {
+                    'input_prompt': input_prompts[idx],
+                    'new_thought': new_thought,
+                },
+            )
+        if "So the answer is:" not in new_thought:
+            new_active_item_ids.append(item_id)
+    # 6. contiue loop
+    active_item_ids = new_active_item_ids
+    if active_item_ids:
+        new_thoughts_for_retrieval = [batch_thoughts[item_id][-1] for item_id in active_item_ids]
+        new_retrieval_results, new_scoress = self.retriever.batch_search(new_thoughts_for_retrieval, return_score=True)
+        for i, item_id in enumerate(active_item_ids):
+            new_retrieval_result, new_scores = new_retrieval_results[i],new_scoress[i]
+            for doc_item, score in zip(new_retrieval_result, new_scores):
+                doc_id = doc_item['id']
+                id2doc_batch[item_id][doc_id] = doc_item
+                if doc_id in doc2score_batch[item_id]:
+                    doc2score_batch[item_id][doc_id] = max(doc2score_batch[item_id][doc_id], score)
+                else:
+                    doc2score_batch[item_id][doc_id] = score
+            sorted_doc_score = sorted(doc2score_batch[item_id].items(), key=lambda x: x[1], reverse=False)
+            sorted_doc_id = [t[0] for t in sorted_doc_score]
+            batch_retrieval_results[item_id] = [id2doc_batch[item_id][id] for id in sorted_doc_id]
+    iter_num += 1
+# 7. Stop and save results
+for item_id, item in enumerate(items):
+    item.update_output('retrieval_result', batch_retrieval_results[item_id])
+    item.update_output('pred', ' '.join(batch_thoughts[item_id]))
+</code></pre>
                   </div>
                 </section>
 
                 <section class="code-card" aria-label="UltraRAG code">
                   <div class="code-card__header">
                     <span>UltraRAG</span>
-                    <div class="code-badges"><span class="code-badge">YAML</span><span class="code-badge">Branch Router</span></div>
+                    <div class="code-badges"><span class="code-badge">YAML</span><span class="code-badge">Branch + Loop</span></div>
                   </div>
                   <div class="code-card__body" role="region" aria-label="UltraRAG source code">
-<pre><code class="language-yaml"># [A] Build prompts in batch
+<pre><code class="language-yaml"># 1. Initial retrieval
+- benchmark.get_data
+- loop:
+    times: 2
+    # 2. Start the iterative process
+    steps:
+    - retriever.retriever_deploy_search
+    # 3. Construct prompts
+    - prompt.ircot_next_prompt
+    # 4. Generate cot
+    - generation.generate
+    # 5. determine loop or end
+    - branch:
+        router:
+        - router.ircot_check_end
+        branches:
+          # 6. contiue loop
+          incomplete:
+          - custom.ircot_get_first_sent
+          # 7. Stop and save results
+          complete: []
+- retriever.retriever_deploy_search
 - prompt.ircot_next_prompt
-# [B] Batch generation
 - generation.generate
-- branch:
-    router:
-    # [C][D] state = complete/incomplete
-      - router.ircot_check_end    
-    branches:
-      incomplete:
-      # [E] Continue unfinished samples
-        - custom.ircot_get_first_sent  
-      complete: []</code></pre>
+- custom.ircot_extract_ans
+    </code></pre>
                   </div>
                 </section>
               </div>
@@ -335,7 +394,7 @@ active_item_ids = next_active</code></pre>
             </p>
 
             <div class="item">
-              <img src="static/images/workflow.png" alt="Workflow demo" />
+              <img src="static/images/workflow.png" alt="Workflow demo" style="width:90%; display:block; margin:0 auto;" />
               <h2 class="subtitle has-text-centered">Illustration of System Workflow</h2>
             </div>
 
@@ -364,13 +423,13 @@ active_item_ids = next_active</code></pre>
                       <h2 class="subtitle has-text-centered">Electronics & Information Job Hunting in the Fall</h2>
                     </figure>
                     <div class="content" style="max-height:520px; overflow:auto; padding-right:.5rem;">
-                      <h4 class="title is-6" style="color:#2563eb;">Problem Input</h4>
+                      <h3 class="title is-6" style="color:#2563eb;">❓Problem Input</h3>
                       <p>My background is roughly as follows: I didn’t study well during my undergraduate years and had poor grades. 
                         Later, I went on to a one-year master’s program that wasn’t very rigorous. During my master’s, my grades improved, but I didn’t really gain much solid knowledge. 
                         I only have one internship experience and no projects. 
                         Now I feel that finding a technical position is very difficult for me. 
                         I’m feeling quite lost and would appreciate some career direction advice. #freshgraduatejobsearch #freshgraduate #campusrecruitment #Fall2026 #masterprogram</p>  
-                      <h4 class="title is-6" style="color:#2563eb;">Model Output</h4>
+                      <h3 class="title is-6" style="color:#2563eb;">✅Model Output</h3>
                       <p><strong>Career Guidance for Electronics and Information Engineering Graduates in Fall Recruitment</strong></p>
 
 <h5 class="title is-6">Job Market Analysis</h5>
@@ -424,15 +483,14 @@ active_item_ids = next_active</code></pre>
                       <h2 class="subtitle has-text-centered">NCO School vs. Associate + Conscription</h2>
                     </figure>
                     <div class="content" style="max-height:520px; overflow:auto; padding-right:.5rem;">
-                      <h4 class="title is-6" style="color:#2563eb;">Problem Input</h4>
+                      <h3 class="title is-6" style="color:#2563eb;">❓Problem Input</h3>
                       <p>My younger brother just finished the college entrance exam and is about to choose his path. Which is better: enrolling in an NCO (non-commissioned officer) school or going through a junior college program with compulsory military service? Any advice from those with experience?  
                             #JustAsking #NeedAdvice #Xiaohongshu</p>
-                      <h4 class="title is-6" style="color:#2563eb;">Model Output</h4>
+                      <h3 class="title is-6" style="color:#2563eb;">✅Model Output</h3>
                       <p><strong>Analysis of Pros and Cons Between NCO Schools and Junior Colleges with Conscription, and Suggestions for Choosing</strong></p>
 
 <h5 class="title is-6">Understanding the Basic Definitions and Features</h5>
-<p><strong>Definition and Training Goals of NCO Schools</strong><br>
-NCO schools are a type of military academy, primarily recruiting active-duty soldiers to cultivate non-commissioned officers with strong technical expertise<a href="#case2-ref-1">[1]</a>. These schools feature strict military training and professional courses, aiming to supply the military with highly skilled technical personnel. Students enter as active-duty soldiers, receive military-style management and technical training, and directly serve in the military upon graduation.
+<p>NCO schools are a type of military academy, primarily recruiting active-duty soldiers to cultivate non-commissioned officers with strong technical expertise<a href="#case2-ref-1">[1]</a>. These schools feature strict military training and professional courses, aiming to supply the military with highly skilled technical personnel. Students enter as active-duty soldiers, receive military-style management and technical training, and directly serve in the military upon graduation.
 </p>
 
 <p><strong>Meaning and Policy Requirements of Junior College with Conscription</strong><br>
@@ -531,7 +589,7 @@ When deciding, candidates should weigh personal interests, family conditions, an
             </p>
 
             <div class="item">
-              <img src="static/images/architecture.svg" alt="Architecture" style="width:55%; display:block; margin:0 auto;">
+              <img src="static/images/architecture.png" alt="Architecture" style="width:90%; display:block; margin:0 auto;">
               <h2 class="subtitle has-text-centered">Illustration of the UltraRAG 2.0 Framework</h2>
             </div>
 
@@ -595,15 +653,16 @@ pipeline:
 <pre data-hl style="--hl-start:5; --hl-end:10;"><code class="language-yaml"># Loop: Iteratively execute a group of tools
 pipeline:
 - benchmark.get_data
-- retriever.retriever_init
+- retriever.retriever_deploy_search
 - loop:
     times: 3  
     steps: 
-      - retriever.retriever_search
       - prompt.generate_subquery
       - generation.generate  
-- prompt.generate_final_answer
+      - retriever.retriever_deploy_search
+- prompt.generate_answer
 - generation.generate
+- evaluation.evaluate
   </code></pre>
                   </div>
                 </section>
@@ -621,20 +680,18 @@ pipeline:
 <pre data-hl style="--hl-start:10; --hl-end:18;"><code class="language-yaml"># Branch: Execute different tools based on routing results
 pipeline:
 - benchmark.get_data
-- retriever.retriever_init
-- prompt.generate_query_or_answer
-- generation.generate
+- retriever.retriever_deploy_search
 - loop:
     times: 3         
     steps:
+    - prompt.generate_query_or_answer
+    - generation.generate
     - branch:
         router:
           - router.check_query_or_answer   
         branches:
           is_query:
-            - retriever.retriever_search
-            - prompt.generate_query_or_answer
-            - generation.generate
+            - retriever.retriever_deploy_search
           is_answer: []    
 - evaluation.evaluate
       </code></pre>
