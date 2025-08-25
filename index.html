@@ -211,8 +211,20 @@
           <div class="content has-text-justified">
             <p>
               “简”的价值，在实践中尤为直观。以 <a href="https://arxiv.org/abs/2212.10509" target="_blank">IRCoT</a>
-              这一经典方法为例，官方实现需要 <strong>近 900 行手写逻辑</strong>，FlashRAG 也需要 <strong>超过 110 行代码</strong>。而 UltraRAG 2.0 仅用
-              <strong>50 行代码</strong> 即可完成同等功能。
+              这一经典方法为例，它依赖基于模型生成的 CoT 进行多轮检索直至产出最终答案，整体流程相当复杂。
+            </p>
+
+            <div class="item">
+              <!-- Your image here -->
+              <img src="static/images/ircot.png" alt="MY ALT TEXT" style="width:90%; display:block; margin:0 auto;" />
+              <h2 class="subtitle has-text-centered">
+                IRCoT流程图
+              </h2>
+            </div>
+
+            <p>
+              其官方实现需要 <strong>近 900 行手写逻辑</strong>，FlashRAG 也需要 <strong>超过 110 行代码</strong>。而 UltraRAG 2.0 仅用
+              <strong>50 行代码</strong> 即可完成同等功能。更值得注意的是，其中约一半还是用于编排 Pipeline 的 Yaml 伪代码，这大幅降低了开发门槛与实现成本。
             </p>
 
             <div class="item">
@@ -297,39 +309,71 @@
       <span>FlashRAG</span>
       <div class="code-badges">
         <span class="code-badge">Python</span>
-        <span class="code-badge">Batch + Loop</span>
+        <span class="code-badge">Branch + Loop</span>
       </div>
     </div>
     <div class="code-card__body" role="region" aria-label="FlashRAG source code">
-      <pre><code class="language-python"># [A] 批量构造提示
-input_prompts = [
-    tmpl.get_string(
-        question=items[i].question,
-        retrieval_result=batch_retrieval_results[i],
-        previous_gen=' '.join(batch_thoughts[i])
-    )
-    for i in active_item_ids
-]
+      <pre><code class="language-python"># 1. 初始检索
+questions = [item.question for item in items]
+retrieval_results, scoress = self.retriever.batch_search(questions, return_score=True)
+for retrieval_result, scores in zip(retrieval_results,scoress):   
+    doc2score = {doc_item['id']: score for doc_item, score in zip(retrieval_result, scores)}
+    id2doc = {doc_item['id']: doc_item for doc_item in retrieval_result}
+    batch_retrieval_results.append(retrieval_result)
+    doc2score_batch.append(doc2score)
+    id2doc_batch.append(id2doc)
+# 2. 开始迭代过程
+active_item_ids = list(range(len(items)))  # Track items that need more iterations
+while iter_num < self.max_iter:
+    # 3. 构建提示词
+    input_prompts = [
+        self.prompt_template.get_string(
+            question=items[item_id].question,
+            retrieval_result=batch_retrieval_results[item_id],
+            previous_gen=' '.join(batch_thoughts[item_id])
+        )
+        for item_id in active_item_ids
+    ]
+    # 4. 生成思维链
+    new_thoughts_batch = self.generator.generate(input_prompts, stop=['.', '\n'])
+    # 5. 判断循环或结束
+    new_active_item_ids = []
+    for idx, item_id in enumerate(active_item_ids):
+        new_thought = new_thoughts_batch[idx]
+        batch_thoughts[item_id].append(new_thought)
+        items[item_id].update_output(
+                f'intermediate_output_iter{iter_num}', 
+                {
+                    'input_prompt': input_prompts[idx],
+                    'new_thought': new_thought,
+                },
+            )
+        if "So the answer is:" not in new_thought:
+            new_active_item_ids.append(item_id)
+    # 6. 继续循环
+    active_item_ids = new_active_item_ids
+    if active_item_ids:
+        new_thoughts_for_retrieval = [batch_thoughts[item_id][-1] for item_id in active_item_ids]
+        new_retrieval_results, new_scoress = self.retriever.batch_search(new_thoughts_for_retrieval, return_score=True)
+        for i, item_id in enumerate(active_item_ids):
+            new_retrieval_result, new_scores = new_retrieval_results[i],new_scoress[i]
+            for doc_item, score in zip(new_retrieval_result, new_scores):
+                doc_id = doc_item['id']
+                id2doc_batch[item_id][doc_id] = doc_item
+                if doc_id in doc2score_batch[item_id]:
+                    doc2score_batch[item_id][doc_id] = max(doc2score_batch[item_id][doc_id], score)
+                else:
+                    doc2score_batch[item_id][doc_id] = score
+            sorted_doc_score = sorted(doc2score_batch[item_id].items(), key=lambda x: x[1], reverse=False)
+            sorted_doc_id = [t[0] for t in sorted_doc_score]
+            batch_retrieval_results[item_id] = [id2doc_batch[item_id][id] for id in sorted_doc_id]
+    iter_num += 1
+# 7. 停止并保存结果
+for item_id, item in enumerate(items):
+    item.update_output('retrieval_result', batch_retrieval_results[item_id])
+    item.update_output('pred', ' '.join(batch_thoughts[item_id]))
 
-# [B] 批量生成
-new_thoughts = generator.generate(input_prompts, stop=['.', '\n'])
-
-# [C] 逐项更新 + 终止判定
-next_active = []
-for local_idx, item_id in enumerate(active_item_ids):
-    thought = new_thoughts[local_idx]
-    batch_thoughts[item_id].append(thought)
-
-    items[item_id].update_output(
-        f'intermediate_output_iter{iter_num}',
-        {'input_prompt': input_prompts[local_idx], 'new_thought': thought}
-    )
-    # [D] 终止条件
-    if "so the answer is" not in thought.lower():
-        next_active.append(item_id)
-
-# [E] 对未完成样本继续
-active_item_ids = next_active</code></pre>
+</code></pre>
     </div>
   </section>
 
@@ -339,23 +383,36 @@ active_item_ids = next_active</code></pre>
       <span>UltraRAG</span>
       <div class="code-badges">
         <span class="code-badge">YAML</span>
-        <span class="code-badge">Branch Router</span>
+        <span class="code-badge">Branch + Loop</span>
       </div>
     </div>
     <div class="code-card__body" role="region" aria-label="UltraRAG source code">
-      <pre><code class="language-yaml"># [A] 批量构造提示
+      <pre><code class="language-yaml"># 1. 初始检索
+- benchmark.get_data
+- loop:
+    times: 2
+    # 2. 开始迭代过程
+    steps:
+    - retriever.retriever_deploy_search
+    # 3. 构建提示词
+    - prompt.ircot_next_prompt
+    # 4. 生成思维链
+    - generation.generate
+    # 5. 判断循环或结束
+    - branch:
+        router:
+        - router.ircot_check_end
+        branches:
+          # 6. 继续循环
+          incomplete:
+          - custom.ircot_get_first_sent
+          # 7. 停止并保存结果
+          complete: []
+- retriever.retriever_deploy_search
 - prompt.ircot_next_prompt
-# [B] 批量生成
 - generation.generate
-- branch:
-    router:
-    # [C][D] 判定 state=complete/incomplete
-      - router.ircot_check_end    
-    branches:
-      incomplete:
-      # [E] 对未完成样本继续
-        - custom.ircot_get_first_sent  
-      complete: []</code></pre>
+- custom.ircot_extract_ans
+    </code></pre>
     </div>
   </section>
   </div>
@@ -397,7 +454,7 @@ active_item_ids = next_active</code></pre>
 
             <div class="item">
               <!-- Your image here -->
-              <img src="static/images/workflow.png" alt="MY ALT TEXT" />
+              <img src="static/images/workflow.png" alt="MY ALT TEXT" style="width:90%; display:block; margin:0 auto;" />
               <h2 class="subtitle has-text-centered">
                 示例系统流程图
               </h2>
@@ -434,11 +491,12 @@ active_item_ids = next_active</code></pre>
                     <h2 class="subtitle has-text-centered">电子信息秋招求职</h2>
                   </figure>
                   <div class="content" style="max-height:520px; overflow:auto; padding-right:.5rem;">
-                    <h4 class="title is-6" style="color:#2563eb;">问题输入</h4>
+                    <h3 class="title is-6" style="color:#2563eb;">❓问题输入</h3>
                     <p>个人情况大概是本科时没有好好学习 成绩很烂 然后来了一年水硕 硕士期间成绩还不错 但是真东西没怎么学到 只有一段实习 没有项目 现在感觉找技术岗对我来说很难
                       很迷茫求一些就业方向的建议#应届生找工作 #应届生 #应届 #秋招 #校招 #26秋招 #水硕</p>
                     
-                    <h4 class="title is-6" style="color:#2563eb;">生成结果</h4>
+                    <h3 class="title is-6" style="color:#2563eb;">✅生成结果</h3>
+
                     <p><strong>电子信息专业应届生秋招求职方向建议</strong></p>
 
                     <h5 class="title is-6">求职现状分析</h5>
@@ -510,15 +568,16 @@ active_item_ids = next_active</code></pre>
                     <h2 class="subtitle has-text-centered">士官学校 vs 大专走义务兵</h2>
                   </figure>
                   <div class="content" style="max-height:520px; overflow:auto; padding-right:.5rem;">
-                    <h4 class="title is-6" style="color:#2563eb;">问题输入</h4>
+                    <h3 class="title is-6" style="color:#2563eb;">	❓问题输入</h3>
                     <p>弟弟今年高考 马上报志愿 士官学校和大专走义务兵那个好一点呀？有没有过来人指点一下呀！
                       #不懂就问有问必答 #万能的小红书</p>
 
-                    <h4 class="title is-6" style="color:#2563eb;">生成结果</h4>
+                    <h3 class="title is-6" style="color:#2563eb;">✅生成结果</h3>
+
                     <p><strong>士官学校与大专走义务兵的优劣分析及选择建议</strong></p>
 
                     <h5 class="title is-6">理解两种选择的基本定义与特点</h5>
-                    <p><strong>士官学校的定义与培养目标</strong><br>士官学校是军队院校的一种，主要面向现役士兵招生，培养具备一定专业技术能力的士官人才<a
+                    <p>士官学校是军队院校的一种，主要面向现役士兵招生，培养具备一定专业技术能力的士官人才<a
                         href="#case2-ref-1">[1]</a>。士官学校通常设有严格的军事训练和专业课程，旨在为部队输送高素质的技术骨干。士官学校的学生在入学时已是现役军人，接受的是军事化管理和专业技能培训，毕业后直接进入部队服役。
                     </p>
                     <p>
@@ -633,8 +692,8 @@ active_item_ids = next_active</code></pre>
 
             <div class="item">
               <!-- Your image here -->
-              <img src="static/images/architecture.svg" alt="MY ALT TEXT"
-                style="width:55%; display:block; margin:0 auto;">
+              <img src="static/images/architecture.png" alt="MY ALT TEXT"
+                style="width:90%; display:block; margin:0 auto;">
               <h2 class="subtitle has-text-centered">
                 UltraRAG 2.0 框架示意图
               </h2>
@@ -673,7 +732,7 @@ active_item_ids = next_active</code></pre>
                     </div>
                   </div>
                   <div class="code-card__body" role="region" aria-label="Serial YAML code">
-<pre data-hl style="--hl-start:3; --hl-end:8;"><code class="language-yaml"># 串行：依次执行工具
+<pre><code class="language-yaml"># 串行：依次执行工具
 pipeline:
 - benchmark.get_data
 - retriever.retriever_deploy_search
@@ -698,15 +757,16 @@ pipeline:
 <pre data-hl style="--hl-start:5; --hl-end:10;"><code class="language-yaml"># 循环：循环执行一组工具
 pipeline:
 - benchmark.get_data
-- retriever.retriever_init
+- retriever.retriever_deploy_search
 - loop:
     times: 3  
     steps: 
-      - retriever.retriever_search
       - prompt.generate_subquery
       - generation.generate  
-- prompt.generate_final_answer
+      - retriever.retriever_deploy_search
+- prompt.generate_answer
 - generation.generate
+- evaluation.evaluate
 </code></pre>
                   </div>
                 </section>
@@ -721,23 +781,21 @@ pipeline:
                     </div>
                   </div>
                   <div class="code-card__body" role="region" aria-label="Branch YAML code">
-<pre data-hl style="--hl-start:10; --hl-end:18;"><code class="language-yaml"># 分支：根据路由结果执行不同工具
+<pre data-hl style="--hl-start:10; --hl-end:16;"><code class="language-yaml"># 分支：根据路由结果执行不同工具
 pipeline:
 - benchmark.get_data
-- retriever.retriever_init
-- prompt.generate_query_or_answer
-- generation.generate
+- retriever.retriever_deploy_search
 - loop:
     times: 3         
     steps:
+    - prompt.generate_query_or_answer
+    - generation.generate
     - branch:
         router:
           - router.check_query_or_answer   
         branches:
           is_query:
-            - retriever.retriever_search
-            - prompt.generate_query_or_answer
-            - generation.generate
+            - retriever.retriever_deploy_search
           is_answer: []    
 - evaluation.evaluate
       </code></pre>
